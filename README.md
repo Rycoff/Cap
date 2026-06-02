@@ -4,7 +4,7 @@ Cap is an easy difficulty Linux machine running an HTTP server that performs adm
 
 ## 1. Initial Enumeration
 
-The first thing I did was to perform an Nmap scan against the target machine to identify which ports where open, running services, and potential vulnerabilities.
+The first thing I did was to perform an Nmap scan against the target machine to identify which ports were open, running services, and potential vulnerabilities.
 
 ```bash
 nmap -sV -A 10.129.11.225
@@ -33,13 +33,13 @@ I proceeded to manually inspect the website in order to gather more information 
 
 <img width="1901" height="941" alt="image" src="https://github.com/user-attachments/assets/0b7db5b4-d023-4025-b7ef-b7494241dac4" />
 
-After navigation through the website to look what information I could find, I found a Download button under the Dashboard link. The download file is `.pcap` file
+After navigating through the website to see what information I could find, I found a Download button under the Dashboard link. The download file is `.pcap` file
 
 <img width="1908" height="935" alt="image" src="https://github.com/user-attachments/assets/b573dd0c-e62f-4662-94f3-78244c678882" />
 
 `.pcap` (Packet Capture) file contains captured network traffic and can be analyzed using tools such as Wireshark or tcpdump. It provides visibility into the communication between hosts and can reveal valuable information such as credentials, file transfers, DNS requests, and other network activity.
 
-After looking on the `.pcap` file, no useful information was found. However, what I did notice though was the downloaded `.pcap` file hade the number 1. After a little more digging I found the `0.pcap` file.
+The downloaded capture was available at a URL containing a numeric identifier. Since the identifier appeared predictable, I modified the value from 1 to 0 and gained access to another user's packet capture. This is an example of an Insecure Direct Object Reference (IDOR), where objects can be accessed directly without proper authorization checks.
 
 <img width="1892" height="902" alt="image" src="https://github.com/user-attachments/assets/fcdccbd1-8fea-4eea-ad55-316bedd003ec" />
 
@@ -51,7 +51,7 @@ After reviewing the `1.pcap` file, it looks more promising.
 
 <img width="1903" height="934" alt="image" src="https://github.com/user-attachments/assets/66e6920d-30eb-4f88-971d-e27545a9b6f0" />
 
-After filtering the protocols on only FTP, I found what I was looking fore, credentials.
+After filtering the protocols on only FTP, I found what I was looking for, credentials.
 
 <img width="1898" height="882" alt="image" src="https://github.com/user-attachments/assets/e1e3667d-d99a-452c-ae18-00c1287c4900" />
 
@@ -65,14 +65,11 @@ After getting the login credential information from the `0.pcap` file, I decided
 
 ### SSH
 
-Since I could login to the FTP, I also wanted to try out to see if the same thing with the same credentials on SSH, which worked.
+The recovered credentials were also valid for SSH access, providing a more stable shell on the target.
 
 <img width="887" height="869" alt="image" src="https://github.com/user-attachments/assets/36ca0f2c-1b0d-4404-afb7-c2e4a61e35f7" />
 
-## 3. Vulnerability Identification
-
-## 4. Exploitation
-## 5. Privilege Escalation
+## 3. Privilege Escalation
 
 To be able to do this step I downloaded linpeas.sh from https://linpeas.org and followd the steps:
 1. `wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh`
@@ -103,11 +100,11 @@ To run it, type:
 ```bash
 ./linpeas.sh
 ```
-After completion and going through all the information recevied, I found this.
+After completion and going through all the information received, I found this.
 
 <img width="1897" height="706" alt="image" src="https://github.com/user-attachments/assets/4bc7af18-5118-433b-ab72-155700f065d0" />
 
-By looking the rights of this folder and who owned it, and what was found was that anyone could execute anything in the python.
+LinPEAS revealed that Python 3.8 had the `cap_setuid` capability assigned. This capability allows a process to change its effective user ID, making it possible to spawn a root shell if abused.
 
 <img width="629" height="80" alt="image" src="https://github.com/user-attachments/assets/5eda1493-9807-4063-b385-8b35f4b62fbc" />
 
@@ -121,7 +118,7 @@ So to see if this acutally works, the decision to try it out was made by the fol
 
 <img width="721" height="222" alt="image" src="https://github.com/user-attachments/assets/70138e95-7aab-4261-b880-b0089ee13d8b" />
 
-## 6. Flags
+## 4. Flags
 
 ### User Flag
 
@@ -131,8 +128,15 @@ After gaining initial access to the system, I located and retrieved the user fla
 
 ### Root Flag
 
-After successfully escalating privileges to NT AUTHORITY\SYSTEM, I retrieved the root flag from the Administrator desktop.
+After successfully escalating privileges to root, I retrieved the root flag from the Administrator desktop.
 
 <img width="220" height="91" alt="image" src="https://github.com/user-attachments/assets/97aa9aa0-781a-4d13-bffd-773cf5720fbd" />
 
-## 7. Lessons Learned
+## 5. Lessons Learned
+
+How to identify and exploit an Insecure Direct Object Reference (IDOR) vulnerability.
+How packet capture files can reveal sensitive information when insecure protocols such as FTP are used.
+How to analyze network traffic using Wireshark.
+The risks of transmitting credentials in cleartext.
+How Linux capabilities can introduce privilege escalation opportunities.
+How the cap_setuid capability can be abused to obtain root privileges.
