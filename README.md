@@ -12,8 +12,8 @@ nmap -sV -A 10.129.11.225
 
 ### Scan Explanation
 
-`-sV` enables version detection, allowing Nmap to identify service versions running on open ports.
-`-A` enables aggressive scanning, which includes OS detection, version detection, script scanning, and traceroute in a single command.
+- `-sV` enables version detection, allowing Nmap to identify service versions running on open ports.
+- `-A` enables aggressive scanning, which includes OS detection, version detection, script scanning, and traceroute in a single command.
 
 This type of scan provides a more detailed overview of the target compared to a basic service scan. It is particularly useful during the initial enumeration phase, as it helps identify not only running services and their versions, but also potential misconfigurations and attack vectors that can be further investigated.
 
@@ -37,7 +37,7 @@ After navigating through the website to see what information I could find, I fou
 
 <img width="1908" height="935" alt="image" src="https://github.com/user-attachments/assets/b573dd0c-e62f-4662-94f3-78244c678882" />
 
-`.pcap` (Packet Capture) file contains captured network traffic and can be analyzed using tools such as Wireshark or tcpdump. It provides visibility into the communication between hosts and can reveal valuable information such as credentials, file transfers, DNS requests, and other network activity.
+- `.pcap` (Packet Capture) file contains captured network traffic and can be analyzed using tools such as Wireshark or tcpdump. It provides visibility into the communication between hosts and can reveal valuable information such as credentials, file transfers, DNS requests, and other network activity.
 
 The downloaded capture was available at a URL containing a numeric identifier. Since the identifier appeared predictable, I modified the value from 1 to 0 and gained access to another user's packet capture. This is an example of an Insecure Direct Object Reference (IDOR), where objects can be accessed directly without proper authorization checks.
 
@@ -134,9 +134,24 @@ After successfully escalating privileges to root, I retrieved the root flag.
 
 ## 5. Lessons Learned
 
-How to identify and exploit an Insecure Direct Object Reference (IDOR) vulnerability.
-How packet capture files can reveal sensitive information when insecure protocols such as FTP are used.
-How to analyze network traffic using Wireshark.
-The risks of transmitting credentials in cleartext.
-How Linux capabilities can introduce privilege escalation opportunities.
-How the cap_setuid capability can be abused to obtain root privileges.
+- How to identify and exploit an Insecure Direct Object Reference (IDOR) vulnerability.
+- How packet capture files can reveal sensitive information when insecure protocols such as FTP are used.
+- How to analyze network traffic using Wireshark.
+- The risks of transmitting credentials in cleartext.
+- How Linux capabilities can introduce privilege escalation opportunities.
+- How the cap_setuid capability can be abused to obtain root privileges.
+
+## 6. Mitigation Recommendations
+
+The compromise resulted from an Insecure Direct Object Reference (IDOR) vulnerability that allowed unauthorized access to another user's packet capture files. Sensitive credentials stored in plaintext were exposed, enabling initial access. Privilege escalation was then achieved through the misuse of Linux capabilities.
+
+To mitigate these issues, the following actions are recommended:
+
+- Implement proper authorization checks on all resources to ensure users can only access data they own.
+- Adopt the principle of least privilege when designing web application functionality and access controls.
+- Avoid storing or transmitting credentials in plaintext. Use encrypted communication protocols and secure credential management practices.
+- Regularly review packet capture files and logs to ensure sensitive information is not exposed.
+- Audit Linux capabilities assigned to binaries and remove unnecessary privileges.
+- Perform periodic security assessments to identify authorization flaws and privilege escalation vectors.
+
+Implementing these recommendations will help prevent unauthorized access to sensitive information and reduce the impact of privilege escalation vulnerabilities.
