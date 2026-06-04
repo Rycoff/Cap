@@ -155,3 +155,7 @@ To mitigate these issues, the following actions are recommended:
 - Perform periodic security assessments to identify authorization flaws and privilege escalation vectors.
 
 Implementing these recommendations will help prevent unauthorized access to sensitive information and reduce the impact of privilege escalation vulnerabilities.
+
+## 7. Key Takeaways
+
+Authorization flaws such as IDOR can be just as critical as code execution vulnerabilities.
